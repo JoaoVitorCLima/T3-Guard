@@ -1,10 +1,12 @@
-# Vigia 2oo3
+# T3-Guard
 
 **Três canais de entrada, uma decisão em RTL e uma linha do tempo para investigar o disparo.**
 
 Projeto de bancada para a trilha **Logística & automação** do Hack Brasil 2026. O caso de uso é a investigação de paradas em skids e equipamentos industriais da Região Metropolitana de Salvador, com três leituras sintéticas de uma mesma variável, como pressão. Um canal discrepante pode ser sinalizado sem parar a bancada. Um disparo registra o estado dos canais e o ciclo da transição para orientar o diagnóstico.
 
 [Demo](docs/index.html) · [Submissão e roteiro](SUBMISSAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
+
+O primeiro ensaio de bancada usa pressão. A arquitetura também pode ser adaptada para temperatura, nível ou vazão, com três canais da mesma variável, aquisição compatível e parâmetros específicos para o processo.
 
 ## Arquitetura
 
@@ -35,11 +37,17 @@ python3 gateway/modbus.py --replay docs/trace.csv
 
 Com o Xcelium no PATH, use `bash sim/run.sh xrun`. Durante a validação local, o Xcelium compilou e elaborou o RTL, mas a etapa de simulação retornou erro de licença LMF-03015. O Icarus completou os testes do núcleo e da UART da bancada. O testbench percorre os oito padrões binários do 2oo3 e checa exclusão por discrepância, invalidação de canais, 1oo2, histerese, watchdog e condições de rearme.
 
+## Diagnóstico offline
+
+O [importador de CSV e experimento de classificação](diagnostico/README.md) comparam uma árvore de decisão com a regra de discrepância usando dados sintéticos reproduzíveis.
+
 ## Validação com uma empresa
 
 Proposta inicial para a equipe de automação ou instrumentação da Acelen, em Mataripe, como hipótese de parceiro de bancada. O piloto usa chaves da FPGA e um notebook em ambiente isolado. Critérios de aceite são reproduzir cinco cenários, comparar os registros com a sequência aplicada e medir o tempo para identificar o primeiro evento. A economia de tempo e a redução de paradas indevidas ainda são hipóteses a medir.
 
 Protótipo didático para bancada. A demonstração usa LED como saída. Sensores, estágio de saída, independência e cobertura diagnóstica, falhas de causa comum, deriva, travamento individual e atendimento de SIL dependem de projeto e validação específicos antes de qualquer aplicação industrial.
+
+O [plano de validação](VALIDACAO.md) reúne fontes técnicas e descreve o experimento comparativo para um artigo.
 
 ## Referências
 

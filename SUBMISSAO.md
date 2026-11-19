@@ -1,12 +1,12 @@
 # Submissão ao Hack Brasil 2026
 
-**Nome** Vigia 2oo3  
-**Trilha proposta** Logística & automação  
-**Frase de apresentação** Três canais em FPGA para decidir e registrar um disparo industrial.
+- **Nome** T3-Guard
+- **Trilha proposta** Logística & automação
+- **Frase de apresentação** Três canais em FPGA para decidir e registrar um disparo industrial.
 
 ## Descrição para o painel
 
-Quando um skid para, descobrir qual sinal mudou primeiro pode exigir comparar alarmes e reproduzir condições de falha. O Vigia 2oo3 é um protótipo de bancada em SystemVerilog que recebe três leituras sintéticas, aplica uma votação de dois de três e registra transições com o carimbo de ciclo do hardware. Ao detectar um canal inválido ou discrepante, entra em modo degradado. Se perder dois canais, trava a saída de disparo até rearme local. A demonstração apresenta uma execução real do testbench com injeção de falhas. Um gateway Modbus TCP expõe a telemetria de leitura para validar a integração com supervisão industrial. Nosso primeiro caso de uso é uma bancada de instrumentação para skids na Região Metropolitana de Salvador, com foco em diagnosticar falhas e entender a sequência de paradas.
+Quando um skid para, descobrir qual sinal mudou primeiro pode exigir comparar alarmes e reproduzir condições de falha. O T3-Guard é um protótipo de bancada em SystemVerilog que recebe três leituras sintéticas, aplica uma votação de dois de três e registra transições com o carimbo de ciclo do hardware. Ao detectar um canal inválido ou discrepante, entra em modo degradado. Se perder dois canais, trava a saída de disparo até rearme local. A demonstração apresenta uma execução real do testbench com injeção de falhas. Um gateway Modbus TCP expõe a telemetria de leitura para validar a integração com supervisão industrial. O primeiro caso de uso proposto é monitorar pressão em uma bancada de instrumentação para skids. A arquitetura pode ser adaptada a outras variáveis de processos críticos, como temperatura, nível e vazão, com três canais independentes por variável.
 
 ## Vídeo e roteiro
 
@@ -20,4 +20,8 @@ O vídeo legendado está em [docs/video.mp4](docs/video.mp4). O roteiro acima se
 
 ## Publicação
 
-O regulamento pede repositório público novo no GitHub, demo acessível, vídeo de até três minutos sem login e aceite no painel do time até 30 de novembro de 2026, às 23h59. Publique a pasta `docs/` por GitHub Pages na branch `main` para hospedar a demonstração. Use o endereço público do vídeo e confira os três links em sessão anônima antes do envio. [Regulamento oficial](https://hackbrasil.com/regulamento)
+O regulamento pede repositório público novo no GitHub, demo acessível, vídeo de até três minutos sem login e aceite no painel do time até 30 de novembro de 2026, às 23h59. [Regulamento oficial](https://hackbrasil.com/regulamento)
+
+- Demo e vídeo disponíveis localmente em [docs/index.html](docs/index.html) e [docs/video.mp4](docs/video.mp4).
+
+- [Repositório no GitHub](https://github.com/JoaoVitorCLima/T3-Guard)
