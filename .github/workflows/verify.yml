@@ -1,0 +1,12 @@
+name: Verification
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y iverilog
+      - run: bash sim/run.sh && diff -u docs/trace.csv build/trace.csv
+      - run: iverilog -g2012 -s tb_board -o build/board_tb rtl/vigia.sv fpga/de0cv.sv sim/tb_board.sv && vvp build/board_tb
+      - run: python3 -m unittest discover -s gateway
+

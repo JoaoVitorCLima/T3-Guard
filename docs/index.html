@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vigia 2oo3</title>
+<style>
+:root{color-scheme:dark;--page:#101715;--panel:#182420;--line:#344640;--ink:#edf5ef;--muted:#a9bcb2;--signal:#b9f895;--warning:#ffd28c;--trip:#ff9e91}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:16px system-ui,sans-serif}
+main{max-width:1000px;margin:auto;padding:clamp(20px,5vw,62px)}
+h1{font-size:clamp(48px,9vw,94px);margin:0;letter-spacing:-.075em;line-height:1}
+h2{font-size:1.15rem;margin:0 0 14px}p{color:var(--muted);line-height:1.5}
+header{margin-bottom:30px}small,.mono,output{font-family:ui-monospace,monospace}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0}
+button{font:inherit;border:1px solid var(--line);background:var(--panel);padding:9px 12px;border-radius:8px;cursor:pointer}
+button:hover,button[aria-pressed=true]{border-color:var(--signal);color:var(--signal)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+.panel,.sensor{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:16px}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.sensor strong{display:block;font-size:2rem;margin:5px 0}.sensor span{color:var(--muted)}
+.sensor[data-fault=true]{border-color:var(--warning)}output{font-size:1.18rem}
+[data-status=trip]{color:var(--trip)}[data-status=ok]{color:var(--signal)}
+input{width:100%;accent-color:var(--signal)}.range{display:block;margin-top:14px}
+table{width:100%;border-collapse:collapse;text-align:left}td,th{padding:8px 4px;border-bottom:1px solid var(--line)}
+th{color:var(--muted)}a{color:var(--signal)}.log{margin-top:16px}
+@media(max-width:460px){.summary{gap:5px}.sensor{padding:9px}.sensor strong{font-size:1.6rem}}
+</style>
+</head>
+<body><main>
+<header><h1>Vigia 2oo3</h1><p>Votação de três canais, diagnóstico e sequência de eventos para uma bancada industrial.</p><small>Dados sintéticos gerados pelo RTL · reprodução de simulação</small></header>
+<div class="controls" id="scenarios" aria-label="Cenários do testbench"></div>
+<section class="panel" aria-labelledby="state-title">
+<h2 id="state-title">Estado do protótipo</h2><output id="state" aria-live="polite"></output>
+<p id="detail"></p>
+<label class="range" for="step">Avançar ciclo a ciclo</label>
+<input id="step" type="range" min="0" max="19" value="0">
+<small id="cycle"></small>
+</section>
+<div class="summary" id="channels" aria-label="Leituras dos sensores"></div>
+<section class="panel log"><h2>Sequência de eventos</h2>
+<table><thead><tr><th>Evento</th><th>Ciclo RTL</th><th>Estado</th></tr></thead><tbody id="events"></tbody></table>
+</section>
+<p><a href="trace.csv">Baixar captura do testbench</a> · <a href="video.mp4">Vídeo da demonstração</a></p>
+</main>
+<script src="trace.js"></script>
+<script>
+const scenarios = [[0,'Operação normal'],[3,'Canal discrepante'],[5,'Dois canais indisponíveis'],
+  [7,'Rearme manual'],[8,'Dois votos altos'],[18,'Perda de amostragem']];
+const modes=['Normal','Degradado','Seguro'];
+const trace=window.vigiaTrace;
+const step=document.querySelector('#step');
+const state=document.querySelector('#state');
+const groups=document.querySelector('#scenarios');
+for(const [index,label] of scenarios){
+  const button=document.createElement('button');
+  button.textContent=label; button.dataset.index=index;
+  button.addEventListener('click',()=>{step.value=index; render();});
+  groups.append(button);
+}
+function render(){
+  const i=Number(step.value), row=trace[i];
+  const [,a,b,c,trip,mode,bad,high,timeout]=row;
+  state.textContent=modes[mode]+' / '+(trip?'Disparo travado':'Liberado');
+  state.dataset.status=trip?'trip':'ok';
+  document.querySelector('#detail').textContent=timeout?'Watchdog detectou perda de amostragem.':
+    mode===1?'Um canal excluído. Um voto alto dos dois restantes basta para disparar.':
+    mode===2?'Menos de dois canais válidos. A saída entra em disparo.':
+    trip?'A saída permanece em disparo até rearme local com três canais saudáveis e baixos.':
+    'Dois votos altos acionam o disparo.';
+  document.querySelector('#cycle').textContent='Ciclo '+row[0];
+  document.querySelector('#channels').innerHTML=[a,b,c].map((value,j)=>{
+    const fault=Boolean(bad&(1<<j));
+    return '<div class="sensor" data-fault="'+fault+'"><span>Canal '+'ABC'[j]+
+      '</span><strong>'+value+'</strong><span>'+(fault?'Excluído':high&(1<<j)?'Voto alto':'Voto baixo')+'</span></div>';
+  }).join('');
+  document.querySelector('#events').innerHTML=trace.slice(0,i+1).filter((r,j)=>!j||r[9]!==trace[j-1][9])
+    .reverse().map(r=>'<tr><td>'+r[9]+'</td><td>'+r[10]+'</td><td>'+modes[r[5]]+
+       (r[4]?' / Disparo':' / Liberado')+'</td></tr>').join('');
+  for(const button of groups.children)button.setAttribute('aria-pressed',String(Number(button.dataset.index)===i));
+}
+step.max=trace.length-1;
+step.addEventListener('input',render);
+render();
+</script>
+</body>
+</html>
+
