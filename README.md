@@ -18,19 +18,35 @@ O primeiro ensaio usa pressão em um skid. A arquitetura é reaproveitável em l
 
 ## Arquitetura
 
-```text
-Entradas sintéticas A/B/C → diagnóstico e votação em SystemVerilog → saída de trip (LED)
-                                        └→ último evento com timestamp → UART → gateway FC04 local
-Testbench do mesmo RTL → captura CSV → painel com reprodução ciclo a ciclo
+### Ensaio integrado
+
+O gateway verifica a autenticação, a sessão e a sequência de cada amostra. Apenas rodadas aceitas chegam ao RTL. Um cliente Modbus real em loopback lê o estado do votador e os contadores de rejeição. O painel reproduz essa captura.
+
+```mermaid
+flowchart TD
+    A["Amostras assinadas A, B e C"] --> G["Gateway de integridade"]
+    G -->|Rodadas aceitas| R["RTL 2oo3 no Icarus"]
+    G -->|Rejeições| M["Modbus TCP de leitura · FC04"]
+    R -->|Estado do votador| M
+    M --> P["Captura exibida no painel"]
 ```
 
-- **Normal** com três canais saudáveis. São necessários dois votos altos para disparar.
-- **Degradado** com um canal excluído. Um único voto alto dos dois restantes dispara.
-- **Seguro** com menos de dois canais saudáveis. Disparo imediato e travado até rearme local.
-- Um voto sobe em 700 e permanece alto até 650. A escala sintética vai de 0 a 1000. Uma entrada inválida ou fora da escala é excluída quando amostrada.
-- A discrepância só isola um canal quando os outros dois concordam entre si e o canal se afasta dos dois por três amostras consecutivas. No teste, a diferença precisa passar de 180 unidades. Votos divergentes sem um outlier isolável continuam sendo avaliados pela votação.
-- O watchdog monitora a chegada da amostragem do conjunto. A perda de amostragem invalida os três canais. O trip só libera com um pedido explícito de rearme e uma amostra com três canais saudáveis e baixos.
-- O registrador guarda o último evento, com carimbo de ciclo e contador. O CSV retém a sequência completa do testbench. A bancada transmite uma captura periódica; o contador permite perceber eventos intermediários perdidos.
+### Lógica do votador
+
+| Modo | Canais válidos | Condição de disparo |
+| --- | :---: | --- |
+| **Normal** | 3 | Dois ou mais votos altos (2oo3). |
+| **Degradado** | 2 | Pelo menos um voto alto (1oo2). |
+| **Seguro** | 0 ou 1 | Disparo por falta de canais válidos. |
+
+- **Faixa e histerese.** Na escala sintética de 0 a 1000, o voto sobe em 700 e retorna a zero em 650. Entradas inválidas ou fora da faixa são excluídas.
+- **Diagnóstico.** O RTL exclui um canal quando, por três amostras consecutivas, ele fica a mais de 180 unidades de cada um dos outros dois e a diferença entre esses dois é de até 180 unidades.
+- **Watchdog e rearme.** A perda de amostragem invalida os três canais. Uma vez acionado, o `trip` fica travado até um pedido de rearme acompanhado de uma amostra com três canais válidos e votos baixos.
+- **Eventos.** O RTL guarda o último evento com o ciclo e um contador. O CSV conserva a sequência de eventos observada pelo testbench. Saltos no contador da UART indicam eventos intermediários não recebidos.
+
+### Bancada DE0-CV
+
+O [projeto para a DE0-CV](fpga/README.md) usa chaves para representar os canais. O `trip` acende um LED e a UART exporta o último evento para o gateway. Os ensaios documentados executam o RTL em simulação. A montagem com a placa e o CLP permanece prevista para o piloto.
 
 ## Executar
 
