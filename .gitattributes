@@ -1,2 +1,5 @@
 *.csv text eol=lf
 *.sh text eol=lf
+/docs/*.html text eol=lf
+/docs/*.js text eol=lf
+/docs/SHA256SUMS text eol=lf

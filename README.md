@@ -48,6 +48,21 @@ Com o Xcelium no PATH, use `bash sim/run.sh xrun`. O testbench passou no Xcelium
 
 Para gravar as formas de onda no Xcelium, execute `bash sim/run.sh xrun-waves` e copie o comando `simvision -waves -input ...` exibido no final. O script do visualizador carrega `a`, `b`, `c`, `discrep`, `bad`, `mode` e `trip` e ajusta o zoom para o intervalo completo.
 
+### Conferir os arquivos da entrega
+
+O [manifesto SHA-256](docs/SHA256SUMS) registra os hashes da página, das capturas e dos vídeos. Para comparar os arquivos com o manifesto do commit revisado, rode na raiz do projeto:
+
+```bash
+(cd docs && sha256sum --strict --check SHA256SUMS)
+```
+
+A verificação também roda no GitHub Actions. Se algum arquivo da demo mudar, gere o manifesto com a versão que será entregue:
+
+```bash
+(cd docs && sha256sum index.html integrity.js integrity-trace.js trace.js trace.csv \
+  video-integridade.mp4 video.mp4 > SHA256SUMS)
+```
+
 ## Dados, artigo e IA local
 
 O [PRONTO](https://zenodo.org/records/1341583) reúne medições de processo, pressões e alarmes coletados em uma instalação experimental de escoamento multifásico, em condições normais e com falhas induzidas. O artigo de Stief et al., publicado no *Journal of Process Control* em 2019, apresenta a coleta e exemplos de avaliação de métodos de diagnóstico. No T3-Guard, a pressão medida no ponto PT417 alimenta uma reprodução local com três canais derivados e um desvio injetado em B. [Artigo e DOI](https://doi.org/10.1016/j.jprocont.2019.04.009)

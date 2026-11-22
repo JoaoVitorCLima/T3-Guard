@@ -10,6 +10,8 @@ Uma leitura suspeita no supervisório pode apontar para uma mensagem alterada ou
 
 **Resultado demonstrado.** Em quatro cenários com produtores simulados, a leitura de B permaneceu em 124 kPa após duas rejeições. Quando B passou a enviar 324 kPa em três rodadas autenticadas, o RTL sinalizou a divergência e o Modbus expôs o modo degradado. Buscamos uma equipe de instrumentação para medir o tempo de investigação em um piloto físico.
 
+**Proteção demonstrada.** As amostras de bancada são autenticadas com HMAC-SHA-256 e chaves distintas por canal. A sessão e a sequência permitem identificar repetições. Quando uma amostra é rejeitada, o gateway preserva a última leitura válida e expõe o motivo ao supervisório. O cliente consulta o diagnóstico pelo Modbus TCP de leitura.
+
 ## Contexto e aplicações
 
 O incidente de 2023 em uma estação de bombeamento de Aliquippa, na Pensilvânia, e o caso Stuxnet na instalação de enriquecimento de urânio de Natanz ilustram o impacto que incidentes digitais podem ter sobre operações físicas. O roubo de tokens do Facebook em 2018 ilustra a proteção de credenciais em um contexto distinto de controle de acesso digital. Esses casos contextualizam a proposta de monitoramento defensivo. [Registro legislativo sobre Aliquippa](https://www.palegis.us/legislation/bills/text/PDF/2025/0/HR0087/PN0717) · [Audiência sobre Natanz](https://www.govinfo.gov/content/pkg/CHRG-119hhrg62627/html/CHRG-119hhrg62627.htm) · [Comunicado do Facebook](https://about.fb.com/news/2018/10/update-on-security-issue/amp/)
@@ -58,5 +60,6 @@ O regulamento pede repositório público novo no GitHub, demo acessível, vídeo
 
 - [Demo integrada](docs/index.html)
 - [Vídeo principal](docs/video-integridade.mp4) e [vídeo complementar do RTL](docs/video.mp4)
+- [Manifesto SHA-256 da entrega](docs/SHA256SUMS)
 
 - [Repositório no GitHub](https://github.com/JoaoVitorCLima/T3-Guard)
