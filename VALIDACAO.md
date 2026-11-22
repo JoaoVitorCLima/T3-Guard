@@ -4,6 +4,7 @@
 
 ## Fundamentação
 
+- A [base PRONTO](https://zenodo.org/records/1341583) e o [artigo de Stief et al.](https://doi.org/10.1016/j.jprocont.2019.04.009) fundamentam a reprodução de medições de pressão de um processo físico. O ensaio existente usa a série PT417 e três canais derivados para avaliar a comunicação do diagnóstico ao Modbus.
 - A [IEC 61511-1](https://webstore.iec.ch/en/publication/24241) contextualiza sistemas instrumentados de segurança na indústria de processos. O T3-Guard é um protótipo de bancada com saída representada por LED.
 - O [artigo da NTNU sobre a configuração 2oo3](https://ntnuopen.ntnu.no/ntnu-xmlui/handle/11250/2772258?locale-attribute=en) fundamenta a arquitetura e a discussão sobre modelagem de confiabilidade.
 - O [estudo de campo do SINTEF](https://www.sintef.no/en/publications/publication/0198cc8d8b30-4804a28f-9776-4e42-88cc-41539aff3f9c/) analisa falhas de causa comum reportadas na indústria de petróleo e gás e fundamenta a inclusão de cenários que afetam mais de um canal.
@@ -18,3 +19,7 @@
 Se a bancada física ainda estiver indisponível, uma série real de processo do [SWaT, da SUTD](https://www.sutd.edu.sg/itrust/itrust-labs/datasets/dataset-characteristics/swat/) pode servir de entrada para um ensaio de reprodução. Ao derivar três canais da mesma série, identificar a origem comum das leituras e documentar as perturbações injetadas. Conferir os termos da base antes de redistribuir os arquivos.
 
 A captura publicada com o painel vem de um testbench com dados sintéticos. O experimento de bancada e as medições comparativas acima permanecem propostos.
+
+## Avaliação da detecção precoce com IA local
+
+Treinar no notebook e separar as séries por ensaio completo. Registrar o instante de início de cada perturbação e comparar a árvore com a regra de discrepância em séries de teste reservadas. Medir falsos alarmes, eventos não detectados e tempo entre o primeiro sinal observável e o alerta. Repetir a comparação quando houver dados de três transmissores independentes. Para o modelo embarcado, usar os mesmos vetores no Python e no RTL e comparar as saídas antes de medir a latência na FPGA. A votação 2oo3 permanece responsável pela saída de disparo.

@@ -1,12 +1,18 @@
 # T3-Guard
 
-**Três canais de entrada, uma decisão em RTL e uma linha do tempo para investigar o disparo.**
+**Cibersegurança industrial com verificação local de medições e diagnóstico em FPGA.**
 
-Projeto de bancada para a trilha **Logística & automação** do Hack Brasil 2026. O caso de uso é a investigação de paradas em skids e equipamentos industriais da Região Metropolitana de Salvador, com três leituras sintéticas de uma mesma variável, como pressão. Um canal discrepante pode ser sinalizado sem parar a bancada. Um disparo registra o estado dos canais e o ciclo da transição para orientar o diagnóstico.
+Projeto de bancada para a trilha de **Cibersegurança** do Hack Brasil 2026. O T3-Guard protege a integridade de medições em sistemas industriais críticos. No ensaio de bancada, o gateway autentica amostras de pressão, rejeita mensagens alteradas ou repetidas e expõe o resultado via Modbus TCP. O projeto também inclui um votador 2oo3 em SystemVerilog, validado em simulação, que sinaliza divergências e registra as transições da saída de disparo.
 
 [Demo](docs/index.html) · [Submissão e roteiro](SUBMISSAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
 
-O primeiro ensaio de bancada usa pressão. A arquitetura também pode ser adaptada para temperatura, nível ou vazão, com três canais da mesma variável, aquisição compatível e parâmetros específicos para o processo.
+O primeiro ensaio usa pressão em um skid. A arquitetura é reaproveitável em linhas de petróleo e gás, estações de água e outras aplicações civis de automação. Temperatura, nível e vazão exigem aquisição compatível, três canais da mesma variável e validação com dados do novo processo. O monitoramento de eventos de trancas eletrônicas e controle de acesso físico é uma linha futura, com sinais e regras próprios.
+
+## Por que monitorar localmente
+
+- **Saneamento municipal.** Em 2023, um incidente cibernético atingiu equipamentos de uma estação de bombeamento da autoridade municipal de água de Aliquippa, na Pensilvânia. É um exemplo de como um incidente digital pode afetar a operação de um serviço essencial. [Registro legislativo da Pensilvânia](https://www.palegis.us/legislation/bills/text/PDF/2025/0/HR0087/PN0717)
+- **Controle de acesso digital.** Em 2018, o Facebook relatou o roubo de tokens de acesso a contas. O caso ilustra a importância de proteger credenciais. Em trancas eletrônicas, a aplicação futura seria monitorar eventos de acesso e sinalizar ocorrências para investigação. [Comunicado do Facebook](https://about.fb.com/news/2018/10/update-on-security-issue/amp/)
+- **Natanz.** O caso Stuxnet, associado à instalação iraniana de enriquecimento de urânio, mostra que um incidente em sistemas de controle pode ter efeitos físicos. É uma referência histórica para a motivação em infraestrutura crítica. [Audiência do Congresso dos EUA](https://www.govinfo.gov/content/pkg/CHRG-119hhrg62627/html/CHRG-119hhrg62627.htm)
 
 ## Arquitetura
 
@@ -39,9 +45,11 @@ Com o Xcelium no PATH, use `bash sim/run.sh xrun`. O testbench passou no Xcelium
 
 Para gravar as formas de onda no Xcelium, execute `bash sim/run.sh xrun-waves` e copie o comando `simvision -waves -input ...` exibido no final. O script do visualizador carrega `a`, `b`, `c`, `discrep`, `bad`, `mode` e `trip` e ajusta o zoom para o intervalo completo.
 
-## Diagnóstico offline
+## Dados, artigo e IA local
 
-O [importador de CSV e experimento de classificação](diagnostico/README.md) comparam uma árvore de decisão com a regra de discrepância usando dados sintéticos reproduzíveis.
+O [PRONTO](https://zenodo.org/records/1341583) reúne medições de processo, pressões e alarmes coletados em uma instalação experimental de escoamento multifásico, em condições normais e com falhas induzidas. O artigo de Stief et al., publicado no *Journal of Process Control* em 2019, apresenta a coleta e exemplos de avaliação de métodos de diagnóstico. No T3-Guard, a pressão medida no ponto PT417 alimenta uma reprodução local com três canais derivados e um desvio injetado em B. [Artigo e DOI](https://doi.org/10.1016/j.jprocont.2019.04.009)
+
+A prova de conceito executa o diagnóstico e o ensaio Modbus no próprio notebook, sem depender da internet. O [experimento de classificação](diagnostico/README.md) também treina e testa uma árvore de decisão localmente, com dados sintéticos. A evolução proposta é validar o modelo com ensaios separados e executar a inferência na FPGA. O objetivo é detectar cedo os sinais observáveis de comprometimento, como leituras alteradas ou fora do padrão, e medir quanto tempo o alerta dá para a equipe investigar.
 
 ## Integridade de medições em bancada
 
