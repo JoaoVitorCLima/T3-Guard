@@ -2,11 +2,13 @@
 
 - **Nome** T3-Guard
 - **Trilha proposta** Cibersegurança
-- **Frase de apresentação** Cibersegurança local para detectar cedo sinais de comprometimento em sistemas industriais críticos.
+- **Frase de apresentação** T3-Guard verifica a origem das medições e identifica canais de pressão que merecem investigação.
 
 ## Proposta para o painel
 
-Quando uma leitura chega alterada ao supervisório, a equipe precisa descobrir cedo quais dados merecem investigação. O T3-Guard é uma proposta de cibersegurança industrial com processamento local e sem dependência de internet. Em bancada, o gateway verifica a integridade e a origem das amostras, rejeita mensagens alteradas ou repetidas e publica qualidade e frescor por Modbus TCP de leitura. O projeto também demonstra, em simulação, a votação 2oo3 para comparar canais e registrar transições. Pressão em um skid é o primeiro caso de uso. A próxima etapa é validar um modelo de IA treinado offline para emitir alertas locais e avaliar a inferência na FPGA.
+Uma leitura suspeita no supervisório pode apontar para uma mensagem alterada ou para um transmissor que merece inspeção. O T3-Guard dá à equipe de instrumentação sinais distintos para investigar cada caso. O gateway autentica as medições localmente, bloqueia amostras alteradas ou repetidas e disponibiliza o diagnóstico por Modbus TCP de leitura. No ensaio integrado, o votador 2oo3 em SystemVerilog recebe somente medições aceitas. O cliente Modbus confirma que rejeições preservam a última leitura válida e que o RTL sinaliza um canal autenticado quando sua pressão diverge das outras. O primeiro caso de uso é um skid industrial de pressão, com processamento local em bancada.
+
+**Resultado demonstrado.** Em quatro cenários com produtores simulados, a leitura de B permaneceu em 124 kPa após duas rejeições. Quando B passou a enviar 324 kPa em três rodadas autenticadas, o RTL sinalizou a divergência e o Modbus expôs o modo degradado. Buscamos uma equipe de instrumentação para medir o tempo de investigação em um piloto físico.
 
 ## Contexto e aplicações
 
@@ -22,12 +24,12 @@ Usamos a base pública PRONTO para reproduzir medições reais de uma bancada de
 
 O protótipo atual demonstra diagnóstico de discrepância, registro de eventos e consulta Modbus de leitura. O replay PRONTO usa três canais derivados de uma medição e um desvio injetado em B. Esse ensaio confirma que a divergência chega à supervisão. A mesma divergência pode ocorrer por falha física e exige investigação da causa.
 
-A demonstração de cibersegurança autentica a origem e a integridade das amostras na entrada interna do gateway. Três produtores simulados assinam suas amostras com chaves próprias. O gateway verifica a sessão e o contador de cada canal antes de atualizar a leitura. A regra de discrepância em Python compara leituras aceitas e a telemetria Modbus expõe os motivos de rejeição e o frescor por canal.
+A demonstração integrada usa três produtores simulados que assinam amostras com chaves próprias. O gateway verifica a sessão e o contador de cada canal e acumula as rodadas aceitas. O Icarus executa o RTL sobre essas rodadas. O cliente lê via Modbus TCP o resultado do RTL, a pressão e os contadores de rejeição de cada etapa. A captura reproduzível roda com `python3 -m gateway.demo_integrada`.
 
-- **Amostra válida:** aceitar a leitura e mostrar qualidade e frescor pelo FC04.
-- **Amostra alterada:** demonstrar em uma fixture local que a verificação de integridade rejeita a leitura e registra o motivo.
-- **Amostra repetida:** confirmar que uma leitura já aceita é rejeitada e que o frescor permanece associado à última amostra válida.
-- **Canal autenticado divergente:** sinalizar discrepância pela votação. A autenticação confirma a procedência da mensagem. A comparação ajuda a avaliar a leitura.
+- **Amostra válida.** O cliente Modbus lê B em 124 kPa e confirma a primeira rodada no RTL.
+- **Amostra alterada.** O contador de integridade aumenta para 1. B permanece em 124 kPa e o RTL permanece na primeira rodada.
+- **Amostra repetida.** O contador de repetições aumenta para 1. A leitura e a rodada do RTL permanecem iguais.
+- **Canal autenticado divergente.** B envia 324 kPa em três rodadas aceitas. O RTL sinaliza B e entra no modo degradado. O cliente Modbus lê esse diagnóstico.
 
 ## Vídeo e roteiro
 
@@ -36,12 +38,25 @@ A demonstração de cibersegurança autentica a origem e a integridade das amost
 - **1:20–2:00** Mostrar o diagnóstico 2oo3 e o que o operador enxerga no Modbus TCP.
 - **2:00–2:30** Explicar o uso dos dados do PRONTO, citar o artigo e apresentar a avaliação da IA local como próxima etapa.
 
-O [vídeo de integridade](docs/video-integridade.mp4) usa registradores capturados via FC04 em loopback. O [vídeo do RTL](docs/video.mp4) demonstra a votação 2oo3. A integração com produtores físicos e um CLP permanece pendente.
+O [vídeo de integridade](docs/video-integridade.mp4) e o [painel](docs/index.html) reproduzem a captura integrada por FC04 em loopback. O [vídeo do RTL](docs/video.mp4) mostra os cenários adicionais de disparo. A validação com três transmissores, FPGA física e CLP permanece pendente.
+
+## Proposta de piloto para uma startup
+
+**Cliente inicial.** Equipe de instrumentação ou integradora de automação que atende skids de pressão. O operador precisa identificar o canal suspeito e recuperar a sequência do evento durante uma investigação.
+
+**Oferta inicial.** Um piloto de diagnóstico local em um skid de bancada, com três transmissores, um CLP e o supervisório do parceiro. Entregar configuração, mapa Modbus, registros de ensaio e um relatório comparando a identificação do canal suspeito com e sem o diagnóstico do T3-Guard.
+
+**Aceite do piloto.** Repetir as mesmas condições com e sem o diagnóstico no supervisório e medir tempo mediano até identificar o canal, alarmes indevidos por ensaio e horas de integração. Definir as metas com o parceiro antes de executar a bancada. [Plano de validação](VALIDACAO.md)
+
+**Hipótese comercial.** Um piloto pago com escopo fechado, seguido da oferta de um módulo por skid. Validar quem aprova a compra e se o tempo poupado na investigação justifica o custo de instalação e suporte.
+
+**Convite.** Buscamos uma equipe de instrumentação ou integração de CLP para validar um piloto de pressão em bancada. Podemos demonstrar a rejeição de telemetria alterada, indicar o canal divergente no supervisório e medir o tempo de investigação com a equipe.
 
 ## Publicação
 
 O regulamento pede repositório público novo no GitHub, demo acessível, vídeo de até três minutos sem login e aceite no painel do time até 30 de novembro de 2026, às 23h59. [Regulamento oficial](https://hackbrasil.com/regulamento)
 
-- Demo RTL, vídeo de votação e vídeo de integridade disponíveis localmente em [docs/index.html](docs/index.html), [docs/video.mp4](docs/video.mp4) e [docs/video-integridade.mp4](docs/video-integridade.mp4).
+- [Demo integrada](docs/index.html)
+- [Vídeo principal](docs/video-integridade.mp4) e [vídeo complementar do RTL](docs/video.mp4)
 
 - [Repositório no GitHub](https://github.com/JoaoVitorCLima/T3-Guard)

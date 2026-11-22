@@ -4,6 +4,8 @@
 
 Projeto de bancada para a trilha de **Cibersegurança** do Hack Brasil 2026. O T3-Guard protege a integridade de medições em sistemas industriais críticos. No ensaio de bancada, o gateway autentica amostras de pressão, rejeita mensagens alteradas ou repetidas e expõe o resultado via Modbus TCP. O projeto também inclui um votador 2oo3 em SystemVerilog, validado em simulação, que sinaliza divergências e registra as transições da saída de disparo.
 
+No ensaio integrado, o gateway envia as rodadas aceitas ao RTL simulado no Icarus. O cliente Modbus lê o diagnóstico produzido pelo RTL junto com os contadores de rejeição. O [painel](docs/index.html) e o [vídeo](docs/video-integridade.mp4) reproduzem essa captura.
+
 [Demo](docs/index.html) · [Submissão e roteiro](SUBMISSAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
 
 O primeiro ensaio usa pressão em um skid. A arquitetura é reaproveitável em linhas de petróleo e gás, estações de água e outras aplicações civis de automação. Temperatura, nível e vazão exigem aquisição compatível, três canais da mesma variável e validação com dados do novo processo. O monitoramento de eventos de trancas eletrônicas e controle de acesso físico é uma linha futura, com sinais e regras próprios.
@@ -38,6 +40,7 @@ Abra [docs/index.html](docs/index.html) no navegador para percorrer a captura gr
 bash sim/run.sh
 diff -u docs/trace.csv build/trace.csv
 python3 -m unittest discover -s gateway
+python3 -m gateway.demo_integrada
 python3 gateway/modbus.py --replay docs/trace.csv
 ```
 

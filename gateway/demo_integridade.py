@@ -10,31 +10,38 @@ from gateway.integridade import REGISTER_COUNT, make_scenario
 from gateway.modbus import ModbusHandler, Server
 
 
-def collect_demo():
-    monitor, stages = make_scenario()
+def collect_fc04(snapshot, stages, count):
     results = []
     with Server(("127.0.0.1", 0), ModbusHandler) as server:
-        server.snapshot = monitor
+        server.snapshot = snapshot
         worker = threading.Thread(target=server.serve_forever)
         worker.start()
         try:
             with socket.create_connection(server.server_address, timeout=2) as client:
                 with client.makefile("rb") as response:
-                    for tid, (title, frames) in enumerate(stages, 1):
-                        for frame in frames:
-                            monitor.accept(frame)
-                        client.sendall(struct.pack(">HHHBBHH", tid, 0, 6, 1, 4, 0, REGISTER_COUNT))
-                        expected = struct.pack(">HHHBBB", tid, 0, 3+2*REGISTER_COUNT,
-                                               1, 4, 2*REGISTER_COUNT)
+                    for tid, title in enumerate(stages, 1):
+                        client.sendall(struct.pack(">HHHBBHH", tid, 0, 6, 1, 4, 0, count))
+                        expected = struct.pack(">HHHBBB", tid, 0, 3+2*count, 1, 4, 2*count)
                         if response.read(len(expected)) != expected:
                             raise RuntimeError("Resposta FC04 inesperada")
-                        registers = struct.unpack(f">{REGISTER_COUNT}H",
-                                                  response.read(2*REGISTER_COUNT))
+                        registers = struct.unpack(f">{count}H", response.read(2*count))
                         results.append({"stage": title, "registers": registers})
         finally:
             server.shutdown()
             worker.join()
     return results
+
+
+def collect_demo():
+    monitor, stages = make_scenario()
+
+    def run():
+        for title, frames in stages:
+            for frame in frames:
+                monitor.accept(frame)
+            yield title
+
+    return collect_fc04(monitor, run(), REGISTER_COUNT)
 
 
 def main():

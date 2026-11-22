@@ -26,12 +26,13 @@ def signed_sample(key, session, channel, sequence, pressure):
 
 
 class IntegrityMonitor:
-    def __init__(self, keys, clock=time.monotonic):
+    def __init__(self, keys, clock=time.monotonic, *, on_round=None):
         if len(keys) != 3 or any(len(key) != 32 for key in keys) or len(set(keys)) != 3:
             raise ValueError("Forneça três chaves distintas de 32 bytes")
         self.session = secrets.token_bytes(16)
         self._keys = tuple(keys)
         self._clock = clock
+        self._on_round = on_round
         self._lock = threading.Lock()
         self._sequences = [0, 0, 0]
         self._round = [0, 0, 0]
@@ -77,7 +78,10 @@ class IntegrityMonitor:
             if self._fresh_mask(now) == 7 and all(
                     sequence > previous for sequence, previous in zip(self._sequences, self._round)):
                 self._round[:] = self._sequences
-                self._history.append(tuple(self._pressures))
+                pressures = tuple(self._pressures)
+                self._history.append(pressures)
+                if self._on_round is not None:
+                    self._on_round(pressures)
                 self._suspect = 0
                 if len(self._history) == CONFIRM:
                     window = tuple(self._history)
@@ -108,7 +112,7 @@ def bench_scenario(keys, session):
         for channel, (key, pressure) in enumerate(zip(keys, (123, 324, 123))))
 
 
-def make_scenario():
+def make_scenario(*, on_round=None):
     keys = tuple(secrets.token_bytes(32) for _ in range(3))
-    monitor = IntegrityMonitor(keys)
+    monitor = IntegrityMonitor(keys, on_round=on_round)
     return monitor, bench_scenario(keys, monitor.session)

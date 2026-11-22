@@ -5,29 +5,87 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>T3-Guard</title>
 <style>
-:root{color-scheme:dark;--page:#101715;--panel:#182420;--line:#344640;--ink:#edf5ef;--muted:#a9bcb2;--signal:#b9f895;--warning:#ffd28c;--trip:#ff9e91}
-*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:16px system-ui,sans-serif}
-main{max-width:1000px;margin:auto;padding:clamp(20px,5vw,62px)}
-h1{font-size:clamp(48px,9vw,94px);margin:0;letter-spacing:-.075em;line-height:1}
-h2{font-size:1.15rem;margin:0 0 14px}p{color:var(--muted);line-height:1.5}
-header{margin-bottom:30px}small,.mono,output{font-family:ui-monospace,monospace}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0}
-button{font:inherit;border:1px solid var(--line);background:var(--panel);padding:9px 12px;border-radius:8px;cursor:pointer}
-button:hover,button[aria-pressed=true]{border-color:var(--signal);color:var(--signal)}
-button:focus-visible,input:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
-.panel,.sensor{border:1px solid var(--line);border-radius:13px;background:var(--panel);padding:16px}
-.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
-.sensor strong{display:block;font-size:2rem;margin:5px 0}.sensor span{color:var(--muted)}
-.sensor[data-fault=true]{border-color:var(--warning)}output{font-size:1.18rem}
-[data-status=trip]{color:var(--trip)}[data-status=ok]{color:var(--signal)}
-input{width:100%;accent-color:var(--signal)}.range{display:block;margin-top:14px}
-table{width:100%;border-collapse:collapse;text-align:left}td,th{padding:8px 4px;border-bottom:1px solid var(--line)}
-th{color:var(--muted)}a{color:var(--signal)}.log{margin-top:16px}
-@media(max-width:460px){.summary{gap:5px}.sensor{padding:9px}.sensor strong{font-size:1.6rem}}
+:root {
+  color-scheme: dark;
+  --page: #101715;
+  --panel: #182420;
+  --line: #344640;
+  --ink: #edf5ef;
+  --muted: #afc4b9;
+  --signal: #b9f895;
+  --warning: #ffd28c;
+  --trip: #ff9e91;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 16px system-ui, sans-serif; }
+main { max-width: 1110px; margin: auto; padding: clamp(20px, 5vw, 60px); }
+header { border-top: 3px solid var(--signal); padding: 30px 0; margin-bottom: 16px; }
+h1 { font-size: clamp(48px, 9vw, 88px); margin: 0; letter-spacing: -.065em; line-height: 1; }
+h2 { font-size: clamp(21px, 3vw, 26px); margin: 0 0 8px; }
+p { color: var(--muted); line-height: 1.55; margin: 10px 0; }
+header p { font-size: clamp(18px, 3vw, 24px); margin: 14px 0 20px; }
+header a { display: inline-block; padding: 10px 14px; border: 1px solid var(--line); border-radius: 7px; }
+small, output, .sensor strong { font-family: ui-monospace, monospace; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 14px; }
+button { font: inherit; border: 1px solid var(--line); background: var(--panel); padding: 9px 12px; border-radius: 7px; cursor: pointer; }
+button:hover { border-color: var(--signal); }
+button[aria-pressed=true] { border-color: var(--signal); background: var(--signal); color: var(--page); }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+.panel, .sensor { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); padding: clamp(12px, 2vw, 20px); }
+.summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
+.panel .sensor { background: var(--page); }
+.sensor strong { display: block; font-size: clamp(16px, 4vw, 29px); margin: 5px 0; }
+.sensor span { color: var(--muted); font-size: 14px; }
+.sensor[data-fault=true] { border-color: var(--warning); }
+.sensor[data-fault=true] span:last-child, [data-status=warning] { color: var(--warning); }
+output { font-size: 1.15rem; }
+[data-status=trip] { color: var(--trip); }
+[data-status=ok], a { color: var(--signal); }
+.range { display: block; margin-top: 14px; }
+input { width: 100%; accent-color: var(--signal); }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+td, th { padding: 8px 4px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); }
+.log { margin-top: 16px; }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.metrics div { border-left: 2px solid var(--line); padding-left: 10px; }
+.metrics dt { color: var(--muted); font-size: 14px; }
+.metrics dd { margin: 4px 0 0; font-size: 1.13rem; font-weight: 650; }
+.rtl { margin-top: 42px; border-top: 1px solid var(--line); padding-top: 24px; }
+@media (max-width: 620px) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 460px) {
+  .summary { gap: 6px; }
+  .sensor { padding: 8px; }
+  .controls button { flex: 1 1 135px; }
+}
 </style>
 </head>
 <body><main>
-<header><h1>T3-Guard</h1><p>Votação de três canais, diagnóstico e sequência de eventos para uma bancada industrial.</p><small>Dados sintéticos gerados pelo RTL · reprodução de simulação</small></header>
+<header>
+  <h1>T3-Guard</h1>
+  <p>Integridade de medições em sistemas industriais críticos.</p>
+  <a href="video-integridade.mp4">Assistir à demonstração</a>
+</header>
+<section aria-labelledby="integrity-title">
+  <h2 id="integrity-title">Ensaio integrado de pressão</h2>
+  <p>Selecione um cenário para consultar a captura Modbus. O gateway autentica as amostras simuladas e o RTL 2oo3 é executado no Icarus.</p>
+  <div class="controls" id="integrity-controls" aria-label="Cenários de integridade"></div>
+  <div class="panel" aria-live="polite">
+    <output id="integrity-result"></output>
+    <p id="integrity-detail"></p>
+    <div class="summary" id="integrity-pressure" aria-label="Pressões entregues à supervisão"></div>
+    <dl class="metrics">
+      <div><dt>Falhas de integridade</dt><dd id="integrity-auth"></dd></div>
+      <div><dt>Repetições rejeitadas</dt><dd id="integrity-replay"></dd></div>
+      <div><dt>Rodadas no RTL</dt><dd id="integrity-rounds"></dd></div>
+      <div><dt>Saída do RTL</dt><dd id="integrity-rtl"></dd></div>
+    </dl>
+  </div>
+</section>
+<section class="rtl" aria-labelledby="rtl-title">
+<h2 id="rtl-title">Formas de operação do votador 2oo3</h2>
 <div class="controls" id="scenarios" aria-label="Cenários do testbench"></div>
 <section class="panel" aria-labelledby="state-title">
 <h2 id="state-title">Estado do protótipo</h2><output id="state" aria-live="polite"></output>
@@ -40,8 +98,11 @@ th{color:var(--muted)}a{color:var(--signal)}.log{margin-top:16px}
 <section class="panel log"><h2>Sequência de eventos</h2>
 <table><thead><tr><th>Evento</th><th>Ciclo RTL</th><th>Estado</th></tr></thead><tbody id="events"></tbody></table>
 </section>
-<p><a href="trace.csv">Baixar captura do testbench</a> · <a href="video.mp4">Vídeo da votação</a> · <a href="video-integridade.mp4">Vídeo de integridade</a></p>
+<p><a href="trace.csv">Baixar captura do testbench</a> · <a href="video.mp4">Vídeo da votação</a></p>
+</section>
 </main>
+<script src="integrity-trace.js"></script>
+<script src="integrity.js"></script>
 <script src="trace.js"></script>
 <script>
 const scenarios = [[0,'Operação normal'],[3,'Canal discrepante'],[5,'Dois canais indisponíveis'],

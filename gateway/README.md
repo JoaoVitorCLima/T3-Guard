@@ -73,3 +73,12 @@ Configure a leitura FC04, unidade 1, offset 0 e 12 registradores em 127.0.0.1:15
 Nesta prova de conceito a entrada autenticada percorre uma interface interna com dados sintéticos e o diagnóstico de discrepância roda em Python. A FPGA e o PRONTO permanecem disponíveis em seus modos próprios. Integração com produtores físicos, provisionamento de chaves e proteção do enlace Modbus ficam para um piloto.
 
 [Vídeo da bancada com dados capturados por FC04](../docs/video-integridade.mp4)
+
+## Ensaio integrado com o RTL
+
+```bash
+python3 -m gateway.demo_integrada
+python3 -m gateway.demo_integrada --javascript > docs/integrity-trace.js
+```
+
+O Icarus recebe somente rodadas formadas por leituras autenticadas e retorna os sinais do votador. Cada etapa publica um instantâneo para um cliente Modbus real em loopback. O mapa 0x0501 mantém os campos 1–11 do ensaio de integridade, com `discrep` do RTL no offset 5. Ele acrescenta modo (12), trip (13), ID do evento em duas palavras altas primeiro (14–15) e máscara de canais excluídos (16). O painel é uma reprodução estática desses registros.

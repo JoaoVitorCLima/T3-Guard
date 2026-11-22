@@ -20,6 +20,10 @@ Se a bancada física ainda estiver indisponível, uma série real de processo do
 
 A captura publicada com o painel vem de um testbench com dados sintéticos. O experimento de bancada e as medições comparativas acima permanecem propostos.
 
+## Aceite do piloto com uma equipe de instrumentação
+
+Em bancada isolada, reproduzir operação nominal, alteração de mensagem, repetição, divergência de um transmissor e perda de dois canais. Registrar a condição de referência, o instante do evento, o primeiro alerta e o instante em que o operador identifica o canal. Comparar as mesmas condições com o diagnóstico desabilitado e habilitado no supervisório. Usar a mediana do tempo de identificação, os alarmes indevidos por ensaio e as horas de integração como métricas. Registrar repetições e resultados por cenário. O parceiro define as metas do piloto junto com a equipe.
+
 ## Avaliação da detecção precoce com IA local
 
 Treinar no notebook e separar as séries por ensaio completo. Registrar o instante de início de cada perturbação e comparar a árvore com a regra de discrepância em séries de teste reservadas. Medir falsos alarmes, eventos não detectados e tempo entre o primeiro sinal observável e o alerta. Repetir a comparação quando houver dados de três transmissores independentes. Para o modelo embarcado, usar os mesmos vetores no Python e no RTL e comparar as saídas antes de medir a latência na FPGA. A votação 2oo3 permanece responsável pela saída de disparo.

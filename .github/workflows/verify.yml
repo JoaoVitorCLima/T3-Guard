@@ -9,4 +9,5 @@ jobs:
       - run: bash sim/run.sh && diff -u docs/trace.csv build/trace.csv
       - run: iverilog -g2012 -s tb_board -o build/board_tb rtl/vigia.sv fpga/de0cv.sv sim/tb_board.sv && vvp build/board_tb
       - run: python3 -m unittest discover -s gateway
+      - run: python3 -m gateway.demo_integrada --javascript > build/integrity-trace.js && diff -u docs/integrity-trace.js build/integrity-trace.js
 
