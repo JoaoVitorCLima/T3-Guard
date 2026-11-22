@@ -1,8 +1,10 @@
-"""Local FC04 gateway. Source is an FPGA serial stream or an RTL CSV recording."""
+"""Read-only FC04 gateway for FPGA serial, RTL replay, or pressure CSV."""
 import argparse
 import csv
 from functools import reduce
+from ipaddress import IPv4Address
 from operator import xor
+from pathlib import Path
 import socketserver
 import struct
 import threading
@@ -14,6 +16,14 @@ class Snapshot:
         self.lock = threading.Lock()
         self.values = (0, 0, 0, 0)
         self.updated = None
+        self.pressure = None
+
+    def update_pressure(self, sequence, values, flagged):
+        missing = sum(1 << i for i, value in enumerate(values) if value is None)
+        with self.lock:
+            self.pressure = (sequence, *[65535 if v is None else v for v in values],
+                             missing, flagged)
+            self.updated = time.monotonic()
 
     def update(self, event_id, event_tick, state):
         with self.lock:
@@ -27,6 +37,10 @@ class Snapshot:
         with self.lock:
             event_id, tick, state, lost = self.values
             fresh = self.updated is not None and time.monotonic() - self.updated < 2
+            if self.pressure is not None:
+                sequence, a, b, c, missing, flagged = self.pressure
+                return (0x0301, int(fresh), sequence >> 16, sequence & 65535,
+                        a, b, c, missing, flagged, 1)
             return (0x0201, int(fresh), event_id >> 16, event_id & 65535,
                     tick >> 16, tick & 65535, state, lost)
 
@@ -98,14 +112,52 @@ def main():
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--serial")
     source.add_argument("--replay")
+    source.add_argument("--pressao", type=Path, metavar="CSV")
+    source.add_argument("--demo-integridade", action="store_true")
+    parser.add_argument("--bind", type=IPv4Address, default=IPv4Address("127.0.0.1"))
     parser.add_argument("--port", type=int, default=1502)
     args = parser.parse_args()
+    if args.bind.is_unspecified or args.bind.is_multicast:
+        parser.error("--bind exige um endereço IPv4 específico da bancada")
     snapshot = Snapshot()
-    target, path = (serial_source, args.serial) if args.serial else (replay, args.replay)
-    threading.Thread(target=target, args=(path, snapshot), daemon=True).start()
-    with Server(("127.0.0.1", args.port), ModbusHandler) as server:
+    if args.demo_integridade:
+        from gateway.integridade import ACCEPTED, make_scenario
+
+        snapshot, stages = make_scenario()
+
+        def replay_integrity():
+            for title, frames in stages:
+                for frame in frames:
+                    status = snapshot.accept(frame)
+                    if status != ACCEPTED:
+                        print(f"Entrada rejeitada, código={status}", flush=True)
+                print(title, flush=True)
+                time.sleep(1)
+
+        worker = threading.Thread(target=replay_integrity, daemon=True)
+    elif args.pressao:
+        from diagnostico.offline import baseline, read_csv, WINDOW
+        try:
+            samples = read_csv(args.pressao)
+        except (OSError, ValueError, csv.Error) as error:
+            parser.error(str(error))
+
+        def replay_pressure():
+            for end in range(WINDOW, len(samples) + 1):
+                window = [values for _, values in samples[end-WINDOW:end]]
+                flagged = sum(1 << i for i in range(3) if baseline(window, i))
+                snapshot.update_pressure(end, window[-1], flagged)
+                time.sleep(0.6)
+
+        snapshot.pressure = (0, 65535, 65535, 65535, 7, 0)
+        worker = threading.Thread(target=replay_pressure, daemon=True)
+    else:
+        target, path = (serial_source, args.serial) if args.serial else (replay, args.replay)
+        worker = threading.Thread(target=target, args=(path, snapshot), daemon=True)
+    with Server((str(args.bind), args.port), ModbusHandler) as server:
         server.snapshot = snapshot
-        print(f"Modbus TCP FC04, unit 1, 127.0.0.1:{args.port}", flush=True)
+        worker.start()
+        print(f"Modbus TCP FC04, unit 1, {args.bind}:{server.server_address[1]}", flush=True)
         server.serve_forever()
 
 

@@ -35,11 +35,17 @@ python3 -m unittest discover -s gateway
 python3 gateway/modbus.py --replay docs/trace.csv
 ```
 
-Com o Xcelium no PATH, use `bash sim/run.sh xrun`. Durante a validação local, o Xcelium compilou e elaborou o RTL, mas a etapa de simulação retornou erro de licença LMF-03015. O Icarus completou os testes do núcleo e da UART da bancada. O testbench percorre os oito padrões binários do 2oo3 e checa exclusão por discrepância, invalidação de canais, 1oo2, histerese, watchdog e condições de rearme.
+Com o Xcelium no PATH, use `bash sim/run.sh xrun`. O testbench passou no Xcelium 24.09-s013 e no Icarus. Ele percorre os oito padrões binários do 2oo3 e checa exclusão por discrepância, invalidação de canais, 1oo2, histerese, watchdog e condições de rearme.
+
+Para gravar as formas de onda no Xcelium, execute `bash sim/run.sh xrun-waves` e copie o comando `simvision -waves -input ...` exibido no final. O script do visualizador carrega `a`, `b`, `c`, `discrep`, `bad`, `mode` e `trip` e ajusta o zoom para o intervalo completo.
 
 ## Diagnóstico offline
 
 O [importador de CSV e experimento de classificação](diagnostico/README.md) comparam uma árvore de decisão com a regra de discrepância usando dados sintéticos reproduzíveis.
+
+## Integridade de medições em bancada
+
+O gateway valida amostras autenticadas e rejeita repetições em uma sessão de bancada. O [ensaio Modbus](gateway/README.md#verificação-de-integridade-em-bancada) usa produtores simulados e expõe frescor por canal e contadores de rejeição via FC04.
 
 ## Validação com uma empresa
 

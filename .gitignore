@@ -1,4 +1,6 @@
 build/
+/.simvision/
+/Datasets/
 __pycache__/
 fpga/db/
 fpga/incremental_db/

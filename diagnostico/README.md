@@ -1,4 +1,4 @@
-﻿# Diagnóstico offline de pressão
+# Diagnóstico offline de pressão
 
 O programa usa Python 3 e biblioteca padrão. O classificador é um experimento de bancada com dados sintéticos gerados pelo próprio código. A votação e o disparo continuam no RTL.
 
@@ -28,3 +28,23 @@ O comando de importação usa a regra de referência. O comando de comparação 
 | Árvore experimental | 2 | 3 | 105 |
 
 Resultados do conjunto sintético de teste. O critério adotado foi reduzir falhas não detectadas sem aumentar alarmes indevidos. A árvore ainda é candidata para uma comparação com medições físicas.
+
+## Ensaio de pressão com PRONTO
+
+Use o Python a partir da raiz do repositório. O conversor lê uma coluna de pressão dos CSVs pré-processados do PRONTO. Cada linha vira uma amostra com três canais derivados da mesma medição. O tempo relativo de 1 s por linha representa o recorte para reprodução. A opção de bancada injeta um desvio de +200 kPa em B na segunda metade.
+
+No PowerShell, com Python 3 disponível:
+
+```powershell
+$fonte = Get-ChildItem -LiteralPath Datasets -Recurse -Filter 'Testday2_merged.csv' | Select-Object -First 1
+New-Item -ItemType Directory -Force build | Out-Null
+python -m diagnostico.pronto $fonte.FullName build/pronto-pressao.csv --unidade bar --amostras 60 --desvio-b
+python -m diagnostico.offline --csv build/pronto-pressao.csv
+python -m gateway.modbus --pressao build/pronto-pressao.csv
+```
+
+Nesse exemplo, `Mixture.zone.P` é a pressão manométrica na zona de mistura (PT417, em bar(g), conforme a tabela 2 do artigo). O argumento de unidade explicita a conversão. Confira a unidade do arquivo ao selecionar outra origem. O conversor cria um arquivo novo e rejeita leituras fora da faixa, em vez de limitá-las silenciosamente.
+
+A série é uma medição física de um ponto. A replicação em três canais e a falha injetada servem para testar a integração de bancada. Para o ensaio com três medições independentes, coletar os três transmissores e uma referência de pressão.
+
+Fonte dos dados: [PRONTO, DOI 10.5281/zenodo.1341583](https://zenodo.org/records/1341583). Artigo: [Stief et al., Journal of Process Control 79 (2019), 41–55](https://doi.org/10.1016/j.jprocont.2019.04.009).
