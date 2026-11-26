@@ -2,11 +2,11 @@
 
 **Cibersegurança industrial com verificação local de medições e diagnóstico em FPGA.**
 
-Projeto de bancada para a trilha de **Cibersegurança** do Hack Brasil 2026. O T3-Guard protege a integridade de medições em sistemas industriais críticos. No ensaio de bancada, o gateway autentica amostras de pressão, rejeita mensagens alteradas ou repetidas e expõe o resultado via Modbus TCP. O projeto também inclui um votador 2oo3 em SystemVerilog, validado em simulação, que sinaliza divergências e registra as transições da saída de disparo.
+O T3-Guard é um protótipo de bancada para verificar a integridade de medições em sistemas industriais críticos. O gateway autentica amostras de pressão, rejeita mensagens alteradas ou repetidas e expõe o resultado via Modbus TCP. Um votador 2oo3 em SystemVerilog, validado em simulação, sinaliza divergências e registra as transições da saída de disparo.
 
 No ensaio integrado, o gateway envia as rodadas aceitas ao RTL simulado no Icarus. O cliente Modbus lê o diagnóstico produzido pelo RTL junto com os contadores de rejeição. O [painel](docs/index.html) e o [vídeo](docs/video-integridade.mp4) reproduzem essa captura.
 
-[Demo](docs/index.html) · [Submissão e roteiro](SUBMISSAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
+[Demo](docs/index.html) · [Resultados da demonstração e piloto](DEMONSTRACAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
 
 O primeiro ensaio usa pressão em um skid. A arquitetura é reaproveitável em linhas de petróleo e gás, estações de água e outras aplicações civis de automação. Temperatura, nível e vazão exigem aquisição compatível, três canais da mesma variável e validação com dados do novo processo. O monitoramento de eventos de trancas eletrônicas e controle de acesso físico é uma linha futura, com sinais e regras próprios.
 
@@ -64,7 +64,7 @@ Com o Xcelium no PATH, use `bash sim/run.sh xrun`. O testbench passou no Xcelium
 
 Para gravar as formas de onda no Xcelium, execute `bash sim/run.sh xrun-waves` e copie o comando `simvision -waves -input ...` exibido no final. O script do visualizador carrega `a`, `b`, `c`, `discrep`, `bad`, `mode` e `trip` e ajusta o zoom para o intervalo completo.
 
-### Conferir os arquivos da entrega
+### Conferir os arquivos da demonstração
 
 O [manifesto SHA-256](docs/SHA256SUMS) registra os hashes da página, das capturas e dos vídeos. Para comparar os arquivos com o manifesto do commit revisado, rode na raiz do projeto:
 
@@ -72,7 +72,7 @@ O [manifesto SHA-256](docs/SHA256SUMS) registra os hashes da página, das captur
 (cd docs && sha256sum --strict --check SHA256SUMS)
 ```
 
-A verificação também roda no GitHub Actions. Se algum arquivo da demo mudar, gere o manifesto com a versão que será entregue:
+A verificação também roda no GitHub Actions. Se algum arquivo da demo mudar, atualize o manifesto:
 
 ```bash
 (cd docs && sha256sum index.html integrity.js integrity-trace.js trace.js trace.csv \
@@ -99,6 +99,5 @@ O [plano de validação](VALIDACAO.md) reúne fontes técnicas e descreve o expe
 
 ## Referências
 
-- [Regulamento do Hack Brasil](https://hackbrasil.com/regulamento)
 - [Terasic DE0-CV](https://www.terasic.com.tw/cgi-bin/page/archive.pl?No=921)
 - [Modbus Application Protocol V1.1b3](https://www.modbus.org/file/secure/modbusprotocolspecification.pdf)

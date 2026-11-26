@@ -1,10 +1,8 @@
-# Submissão ao Hack Brasil 2026
+# Demonstração e proposta de piloto do T3-Guard
 
-- **Nome** T3-Guard
-- **Trilha proposta** Cibersegurança
-- **Frase de apresentação** T3-Guard verifica a origem das medições e identifica canais de pressão que merecem investigação.
+O T3-Guard verifica a integridade das medições e identifica canais de pressão que merecem investigação.
 
-## Proposta para o painel
+## Ensaio de bancada
 
 Uma leitura suspeita no supervisório pode apontar para uma mensagem alterada ou para um transmissor que merece inspeção. O T3-Guard dá à equipe de instrumentação sinais distintos para investigar cada caso. O gateway autentica as medições localmente, bloqueia amostras alteradas ou repetidas e disponibiliza o diagnóstico por Modbus TCP de leitura. No ensaio integrado, o votador 2oo3 em SystemVerilog recebe somente medições aceitas. O cliente Modbus confirma que rejeições preservam a última leitura válida e que o RTL sinaliza um canal autenticado quando sua pressão diverge das outras. O primeiro caso de uso é um skid industrial de pressão, com processamento local em bancada.
 
@@ -22,7 +20,7 @@ A mesma arquitetura pode ser adaptada a linhas de processo e bombeamento que med
 
 Usamos a base pública PRONTO para reproduzir medições reais de uma bancada de escoamento multifásico. O ensaio toma uma série de pressão do ponto PT417, deriva três canais a partir dela e introduz um desvio em B. A árvore de decisão foi treinada e testada offline em um conjunto sintético separado. A integração do modelo ao fluxo de diagnóstico e a validação em bancada com três transmissores independentes são etapas seguintes. [Base PRONTO](https://zenodo.org/records/1341583) · [Stief et al., *Journal of Process Control*, 2019](https://doi.org/10.1016/j.jprocont.2019.04.009)
 
-## Escopo de cibersegurança para a inscrição
+## Cenários do ensaio integrado
 
 O protótipo atual demonstra diagnóstico de discrepância, registro de eventos e consulta Modbus de leitura. O replay PRONTO usa três canais derivados de uma medição e um desvio injetado em B. Esse ensaio confirma que a divergência chega à supervisão. A mesma divergência pode ocorrer por falha física e exige investigação da causa.
 
@@ -54,12 +52,10 @@ O [vídeo de integridade](docs/video-integridade.mp4) e o [painel](docs/index.ht
 
 **Convite.** Buscamos uma equipe de instrumentação ou integração de CLP para validar um piloto de pressão em bancada. Podemos demonstrar a rejeição de telemetria alterada, indicar o canal divergente no supervisório e medir o tempo de investigação com a equipe.
 
-## Publicação
-
-O regulamento pede repositório público novo no GitHub, demo acessível, vídeo de até três minutos sem login e aceite no painel do time até 30 de novembro de 2026, às 23h59. [Regulamento oficial](https://hackbrasil.com/regulamento)
+## Arquivos da demonstração
 
 - [Demo integrada](docs/index.html)
 - [Vídeo principal](docs/video-integridade.mp4) e [vídeo complementar do RTL](docs/video.mp4)
-- [Manifesto SHA-256 da entrega](docs/SHA256SUMS)
+- [Manifesto SHA-256](docs/SHA256SUMS)
 
 - [Repositório no GitHub](https://github.com/JoaoVitorCLima/T3-Guard)
