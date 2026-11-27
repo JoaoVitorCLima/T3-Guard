@@ -4,7 +4,7 @@
 
 O T3-Guard é um protótipo de bancada para verificar a integridade de medições em sistemas industriais críticos. O gateway autentica amostras de pressão, rejeita mensagens alteradas ou repetidas e expõe o resultado via Modbus TCP. Um votador 2oo3 em SystemVerilog, validado em simulação, sinaliza divergências e registra as transições da saída de disparo.
 
-No ensaio integrado, o gateway envia as rodadas aceitas ao RTL simulado no Icarus. O cliente Modbus lê o diagnóstico produzido pelo RTL junto com os contadores de rejeição. O [painel](docs/index.html) e o [vídeo](docs/video-integridade.mp4) reproduzem essa captura.
+No ensaio integrado, o gateway envia as rodadas aceitas ao RTL simulado no Icarus. O cliente Modbus lê o diagnóstico produzido pelo RTL junto com os contadores de rejeição. O [painel](docs/index.html) reproduz essa captura. O [vídeo](docs/video-integridade.mp4) mostra os resultados do ensaio integrado, as formas de onda do RTL no Cadence e a preparação da bancada com a DE0-CV.
 
 [Demo](docs/index.html) · [Resultados da demonstração e piloto](DEMONSTRACAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
 

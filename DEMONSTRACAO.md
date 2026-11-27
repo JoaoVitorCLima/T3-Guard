@@ -38,7 +38,7 @@ A demonstração integrada usa três produtores simulados que assinam amostras c
 - **1:20–2:00** Mostrar o diagnóstico 2oo3 e o que o operador enxerga no Modbus TCP.
 - **2:00–2:30** Explicar o uso dos dados do PRONTO, citar o artigo e apresentar a avaliação da IA local como próxima etapa.
 
-O [vídeo de integridade](docs/video-integridade.mp4) e o [painel](docs/index.html) reproduzem a captura integrada por FC04 em loopback. O [vídeo do RTL](docs/video.mp4) mostra os cenários adicionais de disparo. A validação com três transmissores, FPGA física e CLP permanece pendente.
+O [painel](docs/index.html) reproduz a captura integrada por FC04 em loopback. O [vídeo principal](docs/video-integridade.mp4) reúne os resultados dessa captura, as formas de onda do Cadence e a preparação da bancada com a DE0-CV. O [vídeo do RTL](docs/video.mp4) mostra os cenários adicionais de disparo. A validação com três transmissores, FPGA física e CLP permanece pendente.
 
 ## Proposta de piloto para uma startup
 
