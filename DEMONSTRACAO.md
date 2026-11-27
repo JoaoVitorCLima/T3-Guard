@@ -18,11 +18,11 @@ A mesma arquitetura pode ser adaptada a linhas de processo e bombeamento que med
 
 ## Base de dados e artigo
 
-Usamos a base pública PRONTO para reproduzir medições reais de uma bancada de escoamento multifásico. O ensaio toma uma série de pressão do ponto PT417, deriva três canais a partir dela e introduz um desvio em B. A árvore de decisão foi treinada e testada offline em um conjunto sintético separado. A integração do modelo ao fluxo de diagnóstico e a validação em bancada com três transmissores independentes são etapas seguintes. [Base PRONTO](https://zenodo.org/records/1341583) · [Stief et al., *Journal of Process Control*, 2019](https://doi.org/10.1016/j.jprocont.2019.04.009)
+Usamos a base pública PRONTO, coletada em uma [instalação experimental da Universidade de Cranfield](https://skoge.folk.ntnu.no/prost/proceedings/ADCHEM-2018/media/files/0061.pdf), no Reino Unido. A partir da série real de pressão PT417, derivamos três canais de teste e introduzimos um desvio de 200 kPa no canal B. A árvore de decisão foi treinada e testada offline em um conjunto sintético separado. A integração do modelo ao fluxo de diagnóstico e a validação em bancada com três transmissores independentes são etapas seguintes. [Base PRONTO](https://zenodo.org/records/1341583) · [Stief et al., *Journal of Process Control*, 2019](https://doi.org/10.1016/j.jprocont.2019.04.009)
 
 ## Cenários do ensaio integrado
 
-O protótipo atual demonstra diagnóstico de discrepância, registro de eventos e consulta Modbus de leitura. O replay PRONTO usa três canais derivados de uma medição e um desvio injetado em B. Esse ensaio confirma que a divergência chega à supervisão. A mesma divergência pode ocorrer por falha física e exige investigação da causa.
+O protótipo atual demonstra diagnóstico de discrepância, registro de eventos e consulta Modbus de leitura. Na reprodução do PRONTO, a regra de diagnóstico em Python identifica a divergência e um cliente Modbus lê o resultado via FC04 em loopback. A mesma divergência pode ocorrer por falha física e exige investigação da causa.
 
 A demonstração integrada usa três produtores simulados que assinam amostras com chaves próprias. O gateway verifica a sessão e o contador de cada canal e acumula as rodadas aceitas. O Icarus executa o RTL sobre essas rodadas. O cliente lê via Modbus TCP o resultado do RTL, a pressão e os contadores de rejeição de cada etapa. A captura reproduzível roda com `python3 -m gateway.demo_integrada`.
 
@@ -54,7 +54,7 @@ O [painel](docs/index.html) reproduz a captura integrada por FC04 em loopback. O
 
 ## Arquivos da demonstração
 
-- [Demo integrada](docs/index.html)
+- [Demo online](https://joaovitorclima.github.io/T3-Guard/)
 - [Vídeo principal](docs/video-integridade.mp4) e [vídeo complementar do RTL](docs/video.mp4)
 - [Manifesto SHA-256](docs/SHA256SUMS)
 

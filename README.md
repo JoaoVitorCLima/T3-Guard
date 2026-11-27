@@ -6,7 +6,7 @@ O T3-Guard é um protótipo de bancada para verificar a integridade de mediçõe
 
 No ensaio integrado, o gateway envia as rodadas aceitas ao RTL simulado no Icarus. O cliente Modbus lê o diagnóstico produzido pelo RTL junto com os contadores de rejeição. O [painel](docs/index.html) reproduz essa captura. O [vídeo](docs/video-integridade.mp4) mostra os resultados do ensaio integrado, as formas de onda do RTL no Cadence e a preparação da bancada com a DE0-CV.
 
-[Demo](docs/index.html) · [Resultados da demonstração e piloto](DEMONSTRACAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
+[Demo online](https://joaovitorclima.github.io/T3-Guard/) · [Resultados da demonstração e piloto](DEMONSTRACAO.md) · [Bancada DE0-CV](fpga/README.md) · [Gateway Modbus](gateway/README.md)
 
 O primeiro ensaio usa pressão em um skid. A arquitetura é reaproveitável em linhas de petróleo e gás, estações de água e outras aplicações civis de automação. Temperatura, nível e vazão exigem aquisição compatível, três canais da mesma variável e validação com dados do novo processo. O monitoramento de eventos de trancas eletrônicas e controle de acesso físico é uma linha futura, com sinais e regras próprios.
 
